@@ -1,3 +1,15 @@
+#' Title
+#'
+#' @param ChunkName 
+#' @param type 
+#' @param Universe 
+#' @param OrgDb 
+#' @param Levels 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 GenerateLocalGoCode<-function(
     ChunkName="Test",
     type=c("BP","CC","MF"),
@@ -34,12 +46,24 @@ GenerateLocalGoCode<-function(
   return(out)
 }
 
+#' Title
+#'
+#' @param ChunkName 
+#' @param Universe 
+#' @param OrgDb 
+#' @param Levels 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 GenerateAllGOsCode<-function(
     ChunkName="Test",
     Universe="rownames(merged_seurat)",
     OrgDb="org.Mm.eg.db",
     Levels=3){
   out<-c()
+  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," .panel-tabset\n\n"))  
   out<-c(out,GenerateLocalGoCode(
     ChunkName=ChunkName,
     type="BP",
@@ -58,10 +82,23 @@ GenerateAllGOsCode<-function(
     Universe=Universe,
     OrgDb=OrgDb,
     Levels=Levels))
+  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = ""),"\n\n"))  
   out<-paste(out,collapse = "",sep="")
   return(out)
 }
 
+#' Title
+#'
+#' @param ChunkName 
+#' @param ResultsDF 
+#' @param SeuratObject 
+#' @param OrgDb 
+#' @param Levels 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 GenerateLocalResultsAllGOs<-function(
     ChunkName="Test",
     ResultsDF="merged_seurat.markers[merged_seurat.markers$cluster=='2',]",
@@ -69,6 +106,7 @@ GenerateLocalResultsAllGOs<-function(
     OrgDb="org.Mm.eg.db",
     Levels=3){
   out<-c()
+  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," .panel-tabset\n\n"))  
   out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Differentially expressed\n\n"))
   out<-c(out,paste0("```{",ChunkName," DEG}\n"))
   out<-c(out,paste0("LocalResults<-",ResultsDF,"\n"))
@@ -123,6 +161,7 @@ GenerateLocalResultsAllGOs<-function(
     Universe=paste0("rownames(",SeuratObject,")"),
     OrgDb=OrgDb,
     Levels=Levels+1))
+  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = ""),"\n\n"))  
   out<-paste(out,collapse = "",sep="")
   return(out)
 }
