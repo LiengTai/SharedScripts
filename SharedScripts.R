@@ -21,7 +21,7 @@ GenerateLocalGoCode<-function(
   if(type=="BP"){out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Biological Process\n\n"))}
   if(type=="CC"){out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Cellular Component\n\n"))}
   if(type=="MF"){out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Molecular Function\n\n"))}
-  out<-c(out,paste0("```{r ",ChunkName," BP}\n"))
+  out<-c(out,paste0("```{r ",ChunkName," ",type,"}\n"))
   out<-c(out,"if(length(LocalResults$Gene)>0){\n")
   out<-c(out,paste0("LocalGO <- enrichGO(gene = LocalResults[,c('gene')],
                     universe = ",Universe,",
