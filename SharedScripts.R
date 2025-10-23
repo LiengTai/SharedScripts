@@ -124,6 +124,8 @@ GenerateLocalResultsAllGOs<-function(
     Universe=paste0("rownames(",SeuratObject,")"),
     OrgDb=OrgDb,
     Levels=Levels+1))
+  
+  
   out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," UpRegulated\n\n"))
   out<-c(out,paste0("```{",ChunkName," UP}\n"))
   out<-c(out,paste0("LocalResults<-",ResultsDF,"\n"))
@@ -157,7 +159,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"DT::datatable(LocalResults[,c('gene','pct.1','pct.2','avg_log2FC','p_val','p_val_adj')],colnames = c('Gene','pct in cluster','pct out of cluster','avg log2FC','p val','p val adj'),rownames = FALSE, extensions = 'Buttons', options = list( dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel')),escape=FALSE)\n")
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
-    ChunkName=paste(ChunkName,"UP"),
+    ChunkName=paste(ChunkName,"DOWN"),
     Universe=paste0("rownames(",SeuratObject,")"),
     OrgDb=OrgDb,
     Levels=Levels+1))
