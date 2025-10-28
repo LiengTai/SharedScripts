@@ -22,7 +22,7 @@ GenerateLocalGoCode<-function(
   if(type=="CC"){out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Cellular Component\n\n"))}
   if(type=="MF"){out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Molecular Function\n\n"))}
   out<-c(out,paste0("```{r ",ChunkName," ",type,"}\n"))
-  out<-c(out,"if(length(LocalResults$Gene)>0){\n")
+  #out<-c(out,"if(length(LocalResults$Gene)>0){\n")
   out<-c(out,paste0("LocalGO <- enrichGO(gene = LocalResults[,c('gene')],
                     universe = ",Universe,",
                     keyType = 'SYMBOL',
@@ -32,7 +32,9 @@ GenerateLocalGoCode<-function(
                     pvalueCutoff  = 0.01,
                     qvalueCutoff  = 0.05,
                     readable = TRUE)\n"))
-  out<-c(out,"if(!is.null(LocalGO)){LocalGO<-LocalGO@results\n")
+  out<-c(out,"if(!is.null(LocalGO)){\n")
+  out<-c(out,"if(sum(LocalGO@result$qvalue<0.05 & LocalGO@result$p.adjust<0.01)>5){LocalPW<-pairwise_termsim(LocalGO);if(length(LocalPW@termsim)>2){capture.output(T<-treeplot(LocalPW));print(T)}}\n")
+  out<-c(out,"LocalGO<-LocalGO@result\n")
   out<-c(out,"LocalGO<-LocalGO[LocalGO[,'p.adjust']<0.05,]\n")
   out<-c(out,"LocalGO[,'pvalue']<-formatC(LocalGO[,'pvalue'], format = 'e', digits = 2)\n")
   out<-c(out,"LocalGO[,'p.adjust']<-formatC(LocalGO[,'p.adjust'], format = 'e', digits = 2)\n")
@@ -40,7 +42,8 @@ GenerateLocalGoCode<-function(
   out<-c(out,"LocalGO[,'geneID']<-gsub('/',' ', LocalGO[,'geneID'])\n")
   out<-c(out,"LocalGO<-LocalGO[,c('ID', 'Description', 'Count', 'GeneRatio', 'BgRatio', 'pvalue', 'p.adjust', 'qvalue', 'geneID')]\n")
   out<-c(out,"datatable(LocalGO, extensions = c('Buttons','Responsive'), filter=list(position='top'), options=list(dom='Bfrtip', buttons=c('copy','csv','excel')),rownames=FALSE)\n")
-  out<-c(out,"}}\n")
+  out<-c(out,"}\n")
+  #out<-c(out,"}\n")
   out<-c(out,"```\n\n")
   out<-paste(out,collapse = "",sep="")
   return(out)
@@ -63,7 +66,7 @@ GenerateAllGOsCode<-function(
     OrgDb="org.Mm.eg.db",
     Levels=3){
   out<-c()
-  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," .panel-tabset\n\n"))  
+  out<-c(out,paste0(paste0(rep(":",Levels+2),collapse = "")," {.panel-tabset}\n\n"))  
   out<-c(out,GenerateLocalGoCode(
     ChunkName=ChunkName,
     type="BP",
@@ -82,7 +85,7 @@ GenerateAllGOsCode<-function(
     Universe=Universe,
     OrgDb=OrgDb,
     Levels=Levels))
-  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = ""),"\n\n"))  
+  out<-c(out,paste0(paste0(rep(":",Levels+2),collapse = ""),"\n\n"))  
   out<-paste(out,collapse = "",sep="")
   return(out)
 }
@@ -106,17 +109,23 @@ GenerateLocalResultsAllGOs<-function(
     OrgDb="org.Mm.eg.db",
     Levels=3){
   out<-c()
-  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," .panel-tabset\n\n"))  
+  out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," {.panel-tabset}\n\n"))  
   out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Differentially expressed\n\n"))
-  out<-c(out,paste0("```{",ChunkName," DEG}\n"))
+  out<-c(out,paste0("```{r ",ChunkName," DEG}\n"))
+  out<-c(out,"if(!'package:clusterProfiler' %in% search()){library(clusterProfiler)}\n")
+  out<-c(out,"if(!'package:enrichplot' %in% search()){library(enrichplot)}\n")
+  out<-c(out,"if(!'package:utils' %in% search()){library(utils)}\n")
   out<-c(out,paste0("LocalResults<-",ResultsDF,"\n"))
   out<-c(out,"LocalResults<-LocalResults[LocalResults$p_val_adj<0.05, ]\n")
   out<-c(out,"LocalResults<-LocalResults[order(LocalResults$avg_log2FC,decreasing=TRUE), ]\n")
-  out<-c(out,"LocalMarker<-LocalResults$gene[1]\n")
+  out<-c(out,"LocalMarker<-LocalResults\n")
+  out<-c(out,"LocalMarker<-LocalMarker[order(LocalResults$avg_log2FC,decreasing=TRUE),]\n")
+  out<-c(out,"LocalMarker<-LocalMarker[LocalMarker$pct.1>0.5,]\n")
+  out<-c(out,"LocalMarker<-LocalMarker$gene[1]\n")
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(merged_seurat,features = LocalMarker, cols = c('black', 'gold'))\n"))
-  out<-c(out,"LocalMarker[,'avg_log2FC']<-formatC(LocalMarker[,'avg_log2FC'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val']<-formatC(LocalMarker[,'p_val'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val_adj']<-formatC(LocalMarker[,'p_val_adj'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val_adj']<-formatC(LocalResults[,'p_val_adj'], format = 'e', digits = 2)\n")
   out<-c(out,"DT::datatable(LocalResults[,c('gene','pct.1','pct.2','avg_log2FC','p_val','p_val_adj')],colnames = c('Gene','pct in cluster','pct out of cluster','avg log2FC','p val','p val adj'),rownames = FALSE, extensions = 'Buttons', options = list( dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel')),escape=FALSE)\n")
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
@@ -127,16 +136,16 @@ GenerateLocalResultsAllGOs<-function(
   
   
   out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," UpRegulated\n\n"))
-  out<-c(out,paste0("```{",ChunkName," UP}\n"))
+  out<-c(out,paste0("```{r ",ChunkName," UP}\n"))
   out<-c(out,paste0("LocalResults<-",ResultsDF,"\n"))
   out<-c(out,"LocalResults<-LocalResults[LocalResults$avg_log2FC>0, ]\n")
   out<-c(out,"LocalResults<-LocalResults[LocalResults$p_val_adj<0.05, ]\n")
   out<-c(out,"LocalResults<-LocalResults[order(LocalResults$avg_log2FC,decreasing=TRUE), ]\n")
   out<-c(out,"LocalMarker<-LocalResults$gene[1]\n")
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(merged_seurat,features = LocalMarker, cols = c('black', 'gold'))\n"))
-  out<-c(out,"LocalMarker[,'avg_log2FC']<-formatC(LocalMarker[,'avg_log2FC'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val']<-formatC(LocalMarker[,'p_val'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val_adj']<-formatC(LocalMarker[,'p_val_adj'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val_adj']<-formatC(LocalResults[,'p_val_adj'], format = 'e', digits = 2)\n")
   out<-c(out,"DT::datatable(LocalResults[,c('gene','pct.1','pct.2','avg_log2FC','p_val','p_val_adj')],colnames = c('Gene','pct in cluster','pct out of cluster','avg log2FC','p val','p val adj'),rownames = FALSE, extensions = 'Buttons', options = list( dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel')),escape=FALSE)\n")
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
@@ -145,17 +154,17 @@ GenerateLocalResultsAllGOs<-function(
     OrgDb=OrgDb,
     Levels=Levels+1))
   
-  out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," UpRegulated\n\n"))
-  out<-c(out,paste0("```{",ChunkName," DOWN}\n"))
+  out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," DownRegulated\n\n"))
+  out<-c(out,paste0("```{r ",ChunkName," DOWN}\n"))
   out<-c(out,paste0("LocalResults<-",ResultsDF,"\n"))
   out<-c(out,"LocalResults<-LocalResults[LocalResults$avg_log2FC<0, ]\n")
   out<-c(out,"LocalResults<-LocalResults[LocalResults$p_val_adj<0.05, ]\n")
   out<-c(out,"LocalResults<-LocalResults[order(LocalResults$avg_log2FC,decreasing=FALSE), ]\n")
   out<-c(out,"LocalMarker<-LocalResults$gene[1]\n")
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(merged_seurat,features = LocalMarker, cols = c('black', 'gold'))\n"))
-  out<-c(out,"LocalMarker[,'avg_log2FC']<-formatC(LocalMarker[,'avg_log2FC'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val']<-formatC(LocalMarker[,'p_val'], format = 'e', digits = 2)\n")
-  out<-c(out,"LocalMarker[,'p_val_adj']<-formatC(LocalMarker[,'p_val_adj'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
+  out<-c(out,"LocalResults[,'p_val_adj']<-formatC(LocalResults[,'p_val_adj'], format = 'e', digits = 2)\n")
   out<-c(out,"DT::datatable(LocalResults[,c('gene','pct.1','pct.2','avg_log2FC','p_val','p_val_adj')],colnames = c('Gene','pct in cluster','pct out of cluster','avg log2FC','p val','p val adj'),rownames = FALSE, extensions = 'Buttons', options = list( dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel')),escape=FALSE)\n")
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
