@@ -133,7 +133,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
     ChunkName=paste(ChunkName,"DEG"),
-    Universe=Universe),
+    Universe=Universe,
     OrgDb=OrgDb,
     Levels=Levels+1))
   
