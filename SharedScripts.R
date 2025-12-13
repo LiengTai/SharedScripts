@@ -105,9 +105,11 @@ GenerateAllGOsCode<-function(
 GenerateLocalResultsAllGOs<-function(
     ChunkName="Test",
     ResultsDF="merged_seurat.markers[merged_seurat.markers$cluster=='2',]",
+    Universe="rownames(merged_seurat)",
     SeuratObject="merged_seurat",
     OrgDb="org.Mm.eg.db",
     Levels=3){
+  if(Universe=="rownames(merged_seurat)" & SeuratObject!="merged_seurat") Universe=paste0("rownames(",SeuratObject,")")
   out<-c()
   out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = "")," {.panel-tabset}\n\n"))  
   out<-c(out,paste0(paste0(rep("#",Levels),collapse = "")," Differentially expressed\n\n"))
@@ -131,7 +133,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
     ChunkName=paste(ChunkName,"DEG"),
-    Universe=paste0("rownames(",SeuratObject,")"),
+    Universe=Universe),
     OrgDb=OrgDb,
     Levels=Levels+1))
   
@@ -151,7 +153,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
     ChunkName=paste(ChunkName,"UP"),
-    Universe=paste0("rownames(",SeuratObject,")"),
+    Universe=Universe,
     OrgDb=OrgDb,
     Levels=Levels+1))
   
@@ -171,7 +173,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"```\n")
   out<-c(out,GenerateAllGOsCode(
     ChunkName=paste(ChunkName,"DOWN"),
-    Universe=paste0("rownames(",SeuratObject,")"),
+    Universe=Universe,
     OrgDb=OrgDb,
     Levels=Levels+1))
   out<-c(out,paste0(paste0(rep(":",Levels+1),collapse = ""),"\n\n"))  
