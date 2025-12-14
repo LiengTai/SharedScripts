@@ -166,7 +166,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"if(sum(LocalResults$avg_log2FC<0)>1){LocalResults<-LocalResults[LocalResults$avg_log2FC<0, ]\n")
   out<-c(out,"if(sum(LocalResults$p_val_adj<0.05)>1){LocalResults<-LocalResults[LocalResults$p_val_adj<0.05, ]}\n")
   out<-c(out,"LocalResults<-LocalResults[order(LocalResults$avg_log2FC,decreasing=FALSE), ]\n")
-  out<-c(out,"LocalMarker<-LocalMarker\n")
+  out<-c(out,"LocalMarker<-LocalResults\n")
   out<-c(out,"if(sum(LocalMarker$pct.2>0.5)>1){LocalMarker<-LocalMarker[LocalMarker$pct.2>0.5,]}\n")
   out<-c(out,"LocalMarker<-rownames(LocalMarker)[1]\n")
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(",SeuratObject,",features = LocalMarker, cols = c('black', 'gold'))\n"))
