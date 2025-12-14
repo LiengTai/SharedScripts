@@ -107,6 +107,7 @@ GenerateLocalResultsAllGOs<-function(
     ResultsDF="merged_seurat.markers[merged_seurat.markers$cluster=='2',]",
     Universe="rownames(merged_seurat)",
     SeuratObject="merged_seurat",
+    Identity="seurat_clusters"
     OrgDb="org.Mm.eg.db",
     Levels=3){
   if(Universe=="rownames(merged_seurat)" & SeuratObject!="merged_seurat") {Universe=paste0("rownames(",SeuratObject,")")}
@@ -125,6 +126,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"if(sum(LocalMarker$pct.1>0.5)>1){LocalMarker<-LocalMarker[LocalMarker$pct.1>0.5,]}\n")
   out<-c(out,"LocalMarker<-rownames(LocalMarker)[1]\n")
   out<-c(out,"LocalMarker<-gsub('\\\\.[0-9]*$','',LocalMarker)\n")
+  out<-c(out,paste0("Ident(",SeuratObject,")<-",Identity,"\n"))
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(",SeuratObject,",features = LocalMarker, cols = c('black', 'gold'))\n"))
   out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
   out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
@@ -147,6 +149,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"LocalMarker<-LocalResults\n")
   out<-c(out,"if(sum(LocalMarker$pct.1>0.5)>1){LocalMarker<-LocalMarker[LocalMarker$pct.1>0.5,]}\n")
   out<-c(out,"LocalMarker<-rownames(LocalMarker)[1]\n")
+  out<-c(out,paste0("Ident(",SeuratObject,")<-",Identity,"\n"))
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(",SeuratObject,",features = LocalMarker, cols = c('black', 'gold'))\n"))
   out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
   out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
@@ -169,6 +172,7 @@ GenerateLocalResultsAllGOs<-function(
   out<-c(out,"LocalMarker<-LocalResults\n")
   out<-c(out,"if(sum(LocalMarker$pct.2>0.5)>1){LocalMarker<-LocalMarker[LocalMarker$pct.2>0.5,]}\n")
   out<-c(out,"LocalMarker<-rownames(LocalMarker)[1]\n")
+  out<-c(out,paste0("Ident(",SeuratObject,")<-",Identity,"\n"))
   out<-c(out,paste0("DimPlot(",SeuratObject,",label = TRUE)+FeaturePlot(",SeuratObject,",features = LocalMarker, cols = c('black', 'gold'))\n"))
   out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
   out<-c(out,"LocalResults[,'p_val']<-formatC(LocalResults[,'p_val'], format = 'e', digits = 2)\n")
