@@ -107,7 +107,7 @@ GenerateLocalResultsAllGOs<-function(
     ResultsDF="merged_seurat.markers[merged_seurat.markers$cluster=='2',]",
     Universe="rownames(merged_seurat)",
     SeuratObject="merged_seurat",
-    Identity="seurat_clusters"
+    Identity="seurat_clusters",
     OrgDb="org.Mm.eg.db",
     Levels=3){
   if(Universe=="rownames(merged_seurat)" & SeuratObject!="merged_seurat") {Universe=paste0("rownames(",SeuratObject,")")}
