@@ -226,7 +226,7 @@ GenerateLocalTreatmentResultsAllGOs<-function(
   out<-c(out,"if(sum(LocalMarker$pct.1>0.5)>1){LocalMarker<-LocalMarker[LocalMarker$pct.1>0.5,]}\n")
   out<-c(out,"LocalMarker<-rownames(LocalMarker)[1]\n")
   out<-c(out,"LocalMarker<-gsub('\\\\.[0-9]*$','',LocalMarker)\n")
-  out<-c(out,paste0("LocalDiffData<-",SeuratObject,"[,",SeuratObject,"@meta.data$",seurat_clusters,"=='",LocalClusterName,"']"))
+  out<-c(out,paste0("LocalDiffData<-",SeuratObject,"[,",SeuratObject,"@meta.data$",Identity,"=='",LocalClusterName,"']"))
   out<-c(out,paste0("LocalDiffData<-SetIdent(LocalDiffData,value = '",LocalContrastName,"'"))
   out<-c(out,paste0("DotPlot(LocalDiffData,features = c(LocalResults$Feature[1:5],LocalResults$Feature[(length(LocalResults$Feature)-5):length(LocalResults$Feature)]))+RotatedAxis()"))
   out<-c(out,"LocalResults[,'avg_log2FC']<-formatC(LocalResults[,'avg_log2FC'], format = 'e', digits = 2)\n")
